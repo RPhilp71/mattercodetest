@@ -20,8 +20,13 @@ public class QuoteManager implements IQuoteManager {
     @Autowired
     private IQuoteService quoteService;
 
+
     @PostMapping("/save")
     public void AddOrUpdateQuote(@Valid @RequestBody Quote quote) {
+        if(quote.getId() == null) {
+            quote.setId(UUID.randomUUID());
+        }
+
         quoteService.AddOrUpdateQuote(quote);
     }
 

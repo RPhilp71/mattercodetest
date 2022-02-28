@@ -2,6 +2,7 @@ package com.matter.test.services;
 
 import com.matter.test.interfaces.models.ITradeResult;
 import com.matter.test.interfaces.repositories.IQuoteRepository;
+import com.matter.test.interfaces.repositories.ITradeResultRepository;
 import com.matter.test.interfaces.services.IQuoteService;
 import com.matter.test.models.Quote;
 import com.matter.test.models.TradeResult;
@@ -16,12 +17,11 @@ public class QuoteService implements IQuoteService {
     @Autowired
     private IQuoteRepository quoteRepository;
 
+    @Autowired
+    private ITradeResultRepository tradeResultRepository;
+
     @Override
     public void AddOrUpdateQuote(Quote quote) {
-        if(quote.getId() == null) {
-            quote.setId(UUID.randomUUID());
-        }
-
         quoteRepository.save(quote);
     }
 
@@ -62,15 +62,18 @@ public class QuoteService implements IQuoteService {
                 totalVolumeTaken += volumeTaken;
             }
 
+            var tradeResult = TradeResult.FromTradeInfo(symbol, totalPrice, volumeRequested, totalVolumeTaken);
+
             SaveQuotesIfPresent(updatedQuotes);
-            return TradeResult.FromTradeInfo(symbol, totalPrice, volumeRequested, totalVolumeTaken);
+            tradeResultRepository.save(tradeResult);
+            return tradeResult;
         }
     }
 
     // Returns a list of available quotes, from lowest to highest priced
     private Stream<Quote> GetBestAvailableQuotes(String symbol) {
         return quoteRepository.findBySymbol(symbol)
-                .filter(s -> s.isAvailable())
+                .filter(Quote::isAvailable)
                 .sorted(Comparator.comparingDouble(Quote::getPrice));
     }
 

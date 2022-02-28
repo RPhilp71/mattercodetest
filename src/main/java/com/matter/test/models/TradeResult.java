@@ -7,7 +7,6 @@ import com.matter.test.interfaces.models.ITradeResult;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -19,7 +18,6 @@ import java.util.UUID;
 @Document("trade_result")
 public class TradeResult implements ITradeResult {
     @Id
-    @NotNull
     private UUID id;
     @Symbol
     private String symbol;
